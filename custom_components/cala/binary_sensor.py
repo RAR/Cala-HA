@@ -22,24 +22,14 @@ _LOGGER = logging.getLogger(__name__)
 
 BINARY_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
-        key="cloudConnected",
-        name="Cloud Connected",
+        key="status",
+        name="Connected",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
     ),
     BinarySensorEntityDescription(
-        key="boostStatus",
-        name="Boost Mode",
-        icon="mdi:rocket-launch",
-    ),
-    BinarySensorEntityDescription(
-        key="vacationMode",
-        name="Vacation Mode",
-        icon="mdi:palm-tree",
-    ),
-    BinarySensorEntityDescription(
-        key="socketStatus",
-        name="Socket Connected",
-        device_class=BinarySensorDeviceClass.PLUG,
+        key="safetyLockout",
+        name="Safety Lockout",
+        device_class=BinarySensorDeviceClass.PROBLEM,
     ),
 )
 
@@ -91,7 +81,9 @@ class CalaBinarySensor(CoordinatorEntity[CalaDataUpdateCoordinator], BinarySenso
     @property
     def _heater_data(self) -> dict[str, Any]:
         """Get current heater data from coordinator."""
-        return self.coordinator.data.get(self._heater_id, {})
+        if self.coordinator.data:
+            return self.coordinator.data.get(self._heater_id, {})
+        return {}
 
     @property
     def is_on(self) -> bool | None:
@@ -99,6 +91,9 @@ class CalaBinarySensor(CoordinatorEntity[CalaDataUpdateCoordinator], BinarySenso
         value = self._heater_data.get(self.entity_description.key)
         if value is None:
             return None
+        # Handle status field which is a string like "CONNECTED"
+        if self.entity_description.key == "status":
+            return value == "CONNECTED"
         return bool(value)
 
     @property
@@ -106,5 +101,6 @@ class CalaBinarySensor(CoordinatorEntity[CalaDataUpdateCoordinator], BinarySenso
         """Return if entity is available."""
         return (
             self.coordinator.last_update_success
+            and self.coordinator.data is not None
             and self._heater_id in self.coordinator.data
         )
