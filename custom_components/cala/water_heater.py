@@ -20,8 +20,8 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
     DOMAIN,
-    MAX_TEMP_F,
-    MIN_TEMP_F,
+    MAX_TEMP,
+    MIN_TEMP,
     OPERATION_MODE_BOOST,
     OPERATION_MODE_ECO,
     OPERATION_MODE_STANDARD,
@@ -60,8 +60,8 @@ class CalaWaterHeater(CoordinatorEntity[CalaDataUpdateCoordinator], WaterHeaterE
     _attr_has_entity_name = True
     _attr_name = None
     _attr_temperature_unit = UnitOfTemperature.FAHRENHEIT
-    _attr_min_temp = MIN_TEMP_F
-    _attr_max_temp = MAX_TEMP_F
+    _attr_min_temp = MIN_TEMP
+    _attr_max_temp = MAX_TEMP
     _attr_operation_list = OPERATION_LIST
     _attr_supported_features = (
         WaterHeaterEntityFeature.TARGET_TEMPERATURE
