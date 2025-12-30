@@ -94,7 +94,14 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     ) -> bool:
         """Set operation mode for a water heater."""
         try:
-            success = await self.client.set_operation_mode(heater_id, mode)
+            # Get group_id and home_id from heater data
+            heater = self.water_heaters.get(heater_id, {})
+            group_id = heater.get("groupId")
+            home_id = heater.get("homeId")
+            
+            success = await self.client.set_operation_mode(
+                heater_id, mode, group_id=group_id, home_id=home_id
+            )
             if success:
                 await self.async_request_refresh()
             return success
