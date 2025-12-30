@@ -222,9 +222,9 @@ class CalaApiClient:
 
     async def get_water_heater_status(self, device_id: str) -> dict[str, Any]:
         """Get current status of a water heater by IoT_id (deviceId)."""
-        # Get the latest bucketed sensor data
-        query = """
-            query GetLatestSensorData($deviceId: String!) {
+        # Get the latest bucketed sensor data (aggregated)
+        bucketed_query = """
+            query GetLatestBucketedSensorData($deviceId: String!) {
                 listBucketedSensorDataByDeviceIdAndTimestamp(
                     deviceId: $deviceId,
                     sortDirection: DESC,
@@ -257,12 +257,41 @@ class CalaApiClient:
             }
         """
 
-        result = await self._graphql_request(query, {"deviceId": device_id})
-        items = result.get("listBucketedSensorDataByDeviceIdAndTimestamp", {}).get("items", [])
+        # Get the latest raw sensor data (real-time compressor info)
+        raw_query = """
+            query GetLatestRawSensorData($deviceId: String!) {
+                listSensorDataByDeviceIdAndTimestamp(
+                    deviceId: $deviceId,
+                    sortDirection: DESC,
+                    limit: 1
+                ) {
+                    items {
+                        compRunning
+                        compFreq
+                        deliveryTemp
+                        deliveryPressure
+                        suctionPressure
+                        fanPwr
+                    }
+                }
+            }
+        """
 
-        if items:
-            return items[0]
-        return {}
+        # Fetch both in parallel would be nice, but for simplicity do sequentially
+        bucketed_result = await self._graphql_request(bucketed_query, {"deviceId": device_id})
+        bucketed_items = bucketed_result.get("listBucketedSensorDataByDeviceIdAndTimestamp", {}).get("items", [])
+
+        raw_result = await self._graphql_request(raw_query, {"deviceId": device_id})
+        raw_items = raw_result.get("listSensorDataByDeviceIdAndTimestamp", {}).get("items", [])
+
+        # Merge the results
+        data: dict[str, Any] = {}
+        if bucketed_items:
+            data.update(bucketed_items[0])
+        if raw_items:
+            data.update(raw_items[0])
+
+        return data
 
     async def get_device_properties(self, device_id: str) -> dict[str, Any]:
         """Get device properties (firmware, network mode, etc.)."""

@@ -31,6 +31,16 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         name="Safety Lockout",
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
+    BinarySensorEntityDescription(
+        key="compRunning",
+        name="Compressor Running",
+        device_class=BinarySensorDeviceClass.RUNNING,
+    ),
+    BinarySensorEntityDescription(
+        key="fanPwr",
+        name="Fan Running",
+        device_class=BinarySensorDeviceClass.RUNNING,
+    ),
 )
 
 

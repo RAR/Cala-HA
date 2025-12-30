@@ -112,6 +112,34 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:clock-outline",
     ),
+    SensorEntityDescription(
+        key="compFreq",
+        name="Compressor Frequency",
+        native_unit_of_measurement="Hz",
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:sine-wave",
+    ),
+    SensorEntityDescription(
+        key="deliveryTemp",
+        name="Delivery Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        key="deliveryPressure",
+        name="Delivery Pressure",
+        native_unit_of_measurement="kPa",
+        device_class=SensorDeviceClass.PRESSURE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        key="suctionPressure",
+        name="Suction Pressure",
+        native_unit_of_measurement="kPa",
+        device_class=SensorDeviceClass.PRESSURE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
 )
 
 
