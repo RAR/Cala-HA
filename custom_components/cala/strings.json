@@ -1,0 +1,43 @@
+{
+  "title": "Cala Water Heater",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Cala Account",
+        "description": "Enter your Cala app credentials to connect your water heater.",
+        "data": {
+          "username": "Email",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate",
+        "description": "Your Cala session has expired. Please re-enter your credentials.",
+        "data": {
+          "username": "Email",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid email or password. Please check your credentials and try again.",
+      "cannot_connect": "Unable to connect to Cala servers. Please check your internet connection.",
+      "unknown": "An unexpected error occurred. Please try again later."
+    },
+    "abort": {
+      "already_configured": "This Cala account is already configured.",
+      "reauth_successful": "Reauthentication successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Cala Options",
+        "description": "Configure Cala integration settings.",
+        "data": {
+          "scan_interval": "Update interval (seconds)"
+        }
+      }
+    }
+  }
+}

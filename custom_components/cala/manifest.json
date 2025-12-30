@@ -1,0 +1,16 @@
+{
+  "domain": "cala",
+  "name": "Cala Water Heater",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/yourusername/Cala-HA",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "requirements": [
+    "pycognito>=2024.1.0",
+    "gql>=3.4.0",
+    "aiohttp>=3.9.0"
+  ],
+  "version": "1.0.0"
+}
