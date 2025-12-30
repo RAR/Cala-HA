@@ -4,8 +4,8 @@
   "codeowners": [],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/yourusername/Cala-HA",
-  "issue_tracker": "https://github.com/yourusername/Cala-HA/issues",
+  "documentation": "https://github.com/RAR/Cala-HA",
+  "issue_tracker": "https://github.com/RAR/Cala-HA/issues",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
   "requirements": [

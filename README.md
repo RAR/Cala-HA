@@ -1,7 +1,7 @@
 # Cala Water Heater Integration for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![GitHub Release](https://img.shields.io/github/release/yourusername/Cala-HA.svg)](https://github.com/yourusername/Cala-HA/releases)
+[![GitHub Release](https://img.shields.io/github/release/RAR/Cala-HA.svg)](https://github.com/RAR/Cala-HA/releases)
 
 A Home Assistant custom integration for Cala heat pump water heaters. This integration allows you to monitor and control your Cala water heater through Home Assistant.
 
@@ -23,7 +23,7 @@ A Home Assistant custom integration for Cala heat pump water heaters. This integ
 2. Click on "Integrations"
 3. Click the three dots in the top right corner
 4. Select "Custom repositories"
-5. Add this repository URL: `https://github.com/yourusername/Cala-HA`
+5. Add this repository URL: `https://github.com/RAR/Cala-HA`
 6. Select "Integration" as the category
 7. Click "Add"
 8. Search for "Cala Water Heater" and install it
@@ -31,7 +31,7 @@ A Home Assistant custom integration for Cala heat pump water heaters. This integ
 
 ### Manual Installation
 
-1. Download the latest release from the [releases page](https://github.com/yourusername/Cala-HA/releases)
+1. Download the latest release from the [releases page](https://github.com/RAR/Cala-HA/releases)
 2. Extract the `custom_components/cala` folder to your Home Assistant's `custom_components` directory
 3. Restart Home Assistant
 

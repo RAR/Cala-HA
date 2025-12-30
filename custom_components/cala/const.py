@@ -7,8 +7,9 @@ DOMAIN: Final = "cala"
 
 # AWS Configuration (discovered from decompiled app)
 AWS_REGION: Final = "us-east-1"
-AWS_USER_POOL_ID: Final = "us-east-1_bawUVpr9"
-AWS_CLIENT_ID: Final = "5d8a356c1c297bfad33cb108cd"
+AWS_USER_POOL_ID: Final = "us-east-1_bawUVpr9c"
+AWS_CLIENT_ID: Final = "5pgmmkmv4huev9s11se9n1a3rd"
+AWS_IDENTITY_POOL_ID: Final = "us-east-1:2e75dd3e-7711-4cbb-924f-267ace573c3c"
 GRAPHQL_ENDPOINT: Final = "https://5mrdehpsojanvnvqcpeso2npiq.appsync-api.us-east-1.amazonaws.com/graphql"
 
 # Default values
