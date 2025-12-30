@@ -127,3 +127,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Disclaimer
 
 This is an unofficial integration and is not affiliated with, endorsed by, or connected to Cala Systems in any way. Use at your own risk.
+
+## Trademark Disclaimer
+
+All trademarks, logos, and brand names are the property of their respective owners. All company, product, and service names used in this project are for identification purposes only. Use of these names, trademarks, and brands does not imply endorsement.
