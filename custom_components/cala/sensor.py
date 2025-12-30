@@ -15,7 +15,6 @@ from homeassistant.const import (
     UnitOfEnergy,
     UnitOfTemperature,
     UnitOfVolume,
-    UnitOfVolumeFlowRate,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -29,109 +28,89 @@ _LOGGER = logging.getLogger(__name__)
 
 SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
-        key="topTankRawTemp",
+        key="topTankTemp",
         name="Top Tank Temperature",
-        native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        key="upperTankTemp",
+        name="Upper Tank Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        key="lowerTankTemp",
+        name="Lower Tank Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="outletTemp",
         name="Outlet Temperature",
-        native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="inletTemp",
         name="Inlet Temperature",
-        native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="ambientTemp",
         name="Ambient Temperature",
-        native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        key="averageTankTempHigh24",
-        name="Average Tank Temperature (24h)",
-        native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
+        key="energyUsed",
+        name="Energy Used",
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
     ),
     SensorEntityDescription(
-        key="gallonsUsedSum",
-        name="Total Water Used",
-        native_unit_of_measurement=UnitOfVolume.GALLONS,
+        key="litersUsed",
+        name="Water Used",
+        native_unit_of_measurement=UnitOfVolume.LITERS,
         device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.TOTAL_INCREASING,
     ),
     SensorEntityDescription(
-        key="litersUsedSinceLastBoot",
-        name="Water Used Since Boot",
+        key="hotLiters",
+        name="Hot Water Available",
         native_unit_of_measurement=UnitOfVolume.LITERS,
         device_class=SensorDeviceClass.WATER,
-        state_class=SensorStateClass.TOTAL,
-    ),
-    SensorEntityDescription(
-        key="flowRate",
-        name="Water Flow Rate",
-        native_unit_of_measurement=UnitOfVolumeFlowRate.GALLONS_PER_MINUTE,
         state_class=SensorStateClass.MEASUREMENT,
-        icon="mdi:water-pump",
-    ),
-    SensorEntityDescription(
-        key="highEnergyUsage24",
-        name="Energy Usage (24h)",
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL,
-    ),
-    SensorEntityDescription(
-        key="suctionPressure",
-        name="Suction Pressure",
-        native_unit_of_measurement="psi",
-        device_class=SensorDeviceClass.PRESSURE,
-        state_class=SensorStateClass.MEASUREMENT,
-    ),
-    SensorEntityDescription(
-        key="deliveryPressure",
-        name="Delivery Pressure",
-        native_unit_of_measurement="psi",
-        device_class=SensorDeviceClass.PRESSURE,
-        state_class=SensorStateClass.MEASUREMENT,
-    ),
-    SensorEntityDescription(
-        key="compSpeed",
-        name="Compressor Speed",
-        native_unit_of_measurement="RPM",
-        state_class=SensorStateClass.MEASUREMENT,
-        icon="mdi:fan",
-    ),
-    SensorEntityDescription(
-        key="fanPwm",
-        name="Fan Speed",
-        native_unit_of_measurement="%",
-        state_class=SensorStateClass.MEASUREMENT,
-        icon="mdi:fan",
     ),
     SensorEntityDescription(
         key="userDesiredTemp",
         name="Target Temperature",
-        native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="userMaxTemp",
         name="Maximum Temperature Setting",
-        native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        key="uptime",
+        name="Uptime",
+        native_unit_of_measurement="s",
+        device_class=SensorDeviceClass.DURATION,
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:clock-outline",
     ),
 )
 
@@ -185,7 +164,9 @@ class CalaSensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity):
     @property
     def _heater_data(self) -> dict[str, Any]:
         """Get current heater data from coordinator."""
-        return self.coordinator.data.get(self._heater_id, {})
+        if self.coordinator.data:
+            return self.coordinator.data.get(self._heater_id, {})
+        return {}
 
     @property
     def native_value(self) -> float | None:
@@ -197,5 +178,6 @@ class CalaSensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity):
         """Return if entity is available."""
         return (
             self.coordinator.last_update_success
+            and self.coordinator.data is not None
             and self._heater_id in self.coordinator.data
         )

@@ -14,8 +14,8 @@ GRAPHQL_ENDPOINT: Final = "https://5mrdehpsojanvnvqcpeso2npiq.appsync-api.us-eas
 
 # Default values
 DEFAULT_SCAN_INTERVAL: Final = 60  # seconds
-MIN_TEMP: Final = 95  # Fahrenheit
-MAX_TEMP: Final = 140  # Fahrenheit
+MIN_TEMP: Final = 35  # Celsius
+MAX_TEMP: Final = 60  # Celsius
 
 # Water heater modes
 OPERATION_MODE_STANDARD: Final = "standard"

@@ -43,11 +43,17 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             
             # Update status for each water heater
             data: dict[str, Any] = {}
-            for heater_id in self.water_heaters:
+            for heater_id, heater in self.water_heaters.items():
                 try:
-                    status = await self.client.get_water_heater_status(heater_id)
+                    # Use IoT_id to query sensor data
+                    iot_id = heater.get("IoT_id")
+                    if not iot_id:
+                        _LOGGER.warning("No IoT_id for heater %s", heater_id)
+                        continue
+                    
+                    status = await self.client.get_water_heater_status(iot_id)
                     data[heater_id] = {
-                        **self.water_heaters[heater_id],
+                        **heater,
                         **status,
                     }
                 except CalaApiError as err:
@@ -55,7 +61,7 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                         "Failed to get status for heater %s: %s", heater_id, err
                     )
                     # Keep last known data if available
-                    if heater_id in self.data:
+                    if self.data and heater_id in self.data:
                         data[heater_id] = self.data[heater_id]
             
             return data
