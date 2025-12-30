@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import DOMAIN
 from .coordinator import CalaDataUpdateCoordinator
@@ -30,11 +31,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
 
     try:
+        session = async_get_clientsession(hass)
         api_client = CalaApiClient(
             username=entry.data[CONF_USERNAME],
             password=entry.data[CONF_PASSWORD],
+            session=session,
         )
-        await api_client.async_authenticate()
+        await api_client.authenticate()
     except Exception as err:
         _LOGGER.error("Failed to authenticate with Cala API: %s", err)
         raise ConfigEntryAuthFailed from err
