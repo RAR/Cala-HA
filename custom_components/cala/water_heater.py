@@ -48,8 +48,9 @@ async def async_setup_entry(
     coordinator: CalaDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     
     entities = []
-    for heater_id, heater_data in coordinator.data.items():
-        entities.append(CalaWaterHeater(coordinator, heater_id, heater_data))
+    if coordinator.data:
+        for heater_id, heater_data in coordinator.data.items():
+            entities.append(CalaWaterHeater(coordinator, heater_id, heater_data))
     
     async_add_entities(entities)
 

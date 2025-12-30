@@ -145,13 +145,14 @@ async def async_setup_entry(
     coordinator: CalaDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     
     entities = []
-    for heater_id, heater_data in coordinator.data.items():
-        for description in SENSOR_DESCRIPTIONS:
-            # Only add sensor if the heater has this data
-            if description.key in heater_data:
-                entities.append(
-                    CalaSensor(coordinator, heater_id, heater_data, description)
-                )
+    if coordinator.data:
+        for heater_id, heater_data in coordinator.data.items():
+            for description in SENSOR_DESCRIPTIONS:
+                # Only add sensor if the heater has this data
+                if description.key in heater_data:
+                    entities.append(
+                        CalaSensor(coordinator, heater_id, heater_data, description)
+                    )
     
     async_add_entities(entities)
 
