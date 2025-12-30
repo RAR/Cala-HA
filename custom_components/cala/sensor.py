@@ -142,7 +142,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Cala sensor entities."""
-    coordinator: CalaDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: CalaDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     
     entities = []
     for heater_id, heater_data in coordinator.data.items():
