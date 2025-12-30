@@ -257,7 +257,7 @@ class CalaApiClient:
             }
         """
 
-        # Get the latest raw sensor data (real-time compressor info)
+        # Get the latest raw sensor data (real-time temps and compressor info)
         raw_query = """
             query GetLatestRawSensorData($deviceId: String!) {
                 listSensorDataByDeviceIdAndTimestamp(
@@ -266,6 +266,11 @@ class CalaApiClient:
                     limit: 1
                 ) {
                     items {
+                        topTankTemp
+                        upperTankTemp
+                        lowerTankTemp
+                        outletTemp
+                        ambientTemp
                         compRunning
                         compFreq
                         deliveryTemp
