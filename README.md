@@ -3,6 +3,8 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/release/RAR/Cala-HA.svg)](https://github.com/RAR/Cala-HA/releases)
 
+> ⚠️ **Alpha Release**: This integration is still in active development. Features may change, and bugs are expected. Please report any issues on the [GitHub Issues](https://github.com/RAR/Cala-HA/issues) page.
+
 A Home Assistant custom integration for Cala heat pump water heaters. This integration allows you to monitor and control your Cala water heater through Home Assistant.
 
 ## Features
