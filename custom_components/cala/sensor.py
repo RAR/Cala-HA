@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -142,6 +143,26 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
     ),
 )
 
+# Daily usage sensors that reset at midnight
+DAILY_SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
+    SensorEntityDescription(
+        key="dailyEnergyUsed",
+        name="Daily Energy Used",
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL,
+        icon="mdi:lightning-bolt",
+    ),
+    SensorEntityDescription(
+        key="dailyWaterUsed",
+        name="Daily Water Used",
+        native_unit_of_measurement=UnitOfVolume.LITERS,
+        device_class=SensorDeviceClass.WATER,
+        state_class=SensorStateClass.TOTAL,
+        icon="mdi:water",
+    ),
+)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -154,12 +175,19 @@ async def async_setup_entry(
     entities = []
     if coordinator.data:
         for heater_id, heater_data in coordinator.data.items():
+            # Regular sensors
             for description in SENSOR_DESCRIPTIONS:
                 # Only add sensor if the heater has this data
                 if description.key in heater_data:
                     entities.append(
                         CalaSensor(coordinator, heater_id, heater_data, description)
                     )
+            
+            # Daily usage sensors (always add these)
+            for description in DAILY_SENSOR_DESCRIPTIONS:
+                entities.append(
+                    CalaDailySensor(coordinator, heater_id, heater_data, description)
+                )
     
     async_add_entities(entities)
 
@@ -200,6 +228,61 @@ class CalaSensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity):
     def native_value(self) -> float | None:
         """Return the sensor value."""
         return self._heater_data.get(self.entity_description.key)
+
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        return (
+            self.coordinator.last_update_success
+            and self.coordinator.data is not None
+            and self._heater_id in self.coordinator.data
+        )
+
+
+class CalaDailySensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity):
+    """Representation of a Cala daily usage sensor that resets at midnight."""
+
+    _attr_has_entity_name = True
+
+    def __init__(
+        self,
+        coordinator: CalaDataUpdateCoordinator,
+        heater_id: str,
+        heater_data: dict[str, Any],
+        description: SensorEntityDescription,
+    ) -> None:
+        """Initialize the daily sensor entity."""
+        super().__init__(coordinator)
+        self._heater_id = heater_id
+        self.entity_description = description
+        self._attr_unique_id = f"cala_{heater_id}_{description.key}"
+        self._attr_device_info = {
+            "identifiers": {(DOMAIN, heater_id)},
+            "name": heater_data.get("name", "Cala Water Heater"),
+            "manufacturer": "Cala Systems",
+            "model": heater_data.get("model", "Heat Pump Water Heater"),
+            "sw_version": heater_data.get("firmware_version"),
+        }
+
+    @property
+    def _heater_data(self) -> dict[str, Any]:
+        """Get current heater data from coordinator."""
+        if self.coordinator.data:
+            return self.coordinator.data.get(self._heater_id, {})
+        return {}
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the sensor value."""
+        value = self._heater_data.get(self.entity_description.key)
+        if value is not None:
+            return round(value, 3)
+        return None
+
+    @property
+    def last_reset(self) -> datetime | None:
+        """Return the time when the sensor was last reset (midnight)."""
+        return self._heater_data.get("dailyResetTime")
 
     @property
     def available(self) -> bool:

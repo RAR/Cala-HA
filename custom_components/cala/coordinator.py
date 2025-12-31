@@ -2,11 +2,12 @@
 from __future__ import annotations
 
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.util import dt as dt_util
 
 from .api import CalaApiClient, CalaApiError, CalaAuthenticationError
 from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
@@ -31,6 +32,12 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         self.client = client
         self.water_heaters: dict[str, dict[str, Any]] = {}
+        # Daily usage tracking
+        self._daily_energy: dict[str, float] = {}
+        self._daily_water: dict[str, float] = {}
+        self._last_reset_date: dict[str, datetime] = {}
+        self._last_energy: dict[str, float] = {}
+        self._last_water: dict[str, float] = {}
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data from API."""
@@ -43,6 +50,9 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             
             # Update status for each water heater
             data: dict[str, Any] = {}
+            now = dt_util.now()
+            today = now.date()
+            
             for heater_id, heater in self.water_heaters.items():
                 try:
                     # Use IoT_id to query sensor data
@@ -52,6 +62,15 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                         continue
                     
                     status = await self.client.get_water_heater_status(iot_id)
+                    
+                    # Track daily usage
+                    self._update_daily_usage(heater_id, status, today)
+                    
+                    # Add daily totals to the status
+                    status["dailyEnergyUsed"] = self._daily_energy.get(heater_id, 0.0)
+                    status["dailyWaterUsed"] = self._daily_water.get(heater_id, 0.0)
+                    status["dailyResetTime"] = self._get_midnight_timestamp(heater_id)
+                    
                     data[heater_id] = {
                         **heater,
                         **status,
@@ -72,6 +91,40 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             raise UpdateFailed(f"Error communicating with API: {err}") from err
         except Exception as err:
             raise UpdateFailed(f"Unexpected error: {err}") from err
+
+    def _update_daily_usage(
+        self, heater_id: str, status: dict[str, Any], today: datetime
+    ) -> None:
+        """Update daily usage counters, resetting at midnight."""
+        # Check if we need to reset (new day)
+        last_reset = self._last_reset_date.get(heater_id)
+        if last_reset is None or last_reset != today:
+            # Reset daily counters
+            self._daily_energy[heater_id] = 0.0
+            self._daily_water[heater_id] = 0.0
+            self._last_reset_date[heater_id] = today
+            self._last_energy[heater_id] = 0.0
+            self._last_water[heater_id] = 0.0
+            _LOGGER.debug(
+                "Reset daily usage counters for %s at midnight", heater_id
+            )
+        
+        # Get current incremental values from the API
+        current_energy = status.get("energyUsed", 0.0) or 0.0
+        current_water = status.get("litersUsed", 0.0) or 0.0
+        
+        # Add to daily totals (these are already incremental per period)
+        self._daily_energy[heater_id] += current_energy
+        self._daily_water[heater_id] += current_water
+
+    def _get_midnight_timestamp(self, heater_id: str) -> datetime | None:
+        """Get the timestamp of when daily counters were last reset."""
+        reset_date = self._last_reset_date.get(heater_id)
+        if reset_date:
+            return dt_util.start_of_local_day(
+                datetime.combine(reset_date, datetime.min.time())
+            )
+        return None
 
     async def async_set_temperature(
         self, heater_id: str, temperature: float
