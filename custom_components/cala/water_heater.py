@@ -10,7 +10,6 @@ from homeassistant.components.water_heater import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    ATTR_TEMPERATURE,
     STATE_OFF,
     UnitOfTemperature,
 )
@@ -65,8 +64,7 @@ class CalaWaterHeater(CoordinatorEntity[CalaDataUpdateCoordinator], WaterHeaterE
     _attr_max_temp = MAX_TEMP
     _attr_operation_list = OPERATION_LIST
     _attr_supported_features = (
-        WaterHeaterEntityFeature.TARGET_TEMPERATURE
-        | WaterHeaterEntityFeature.OPERATION_MODE
+        WaterHeaterEntityFeature.OPERATION_MODE
         | WaterHeaterEntityFeature.ON_OFF
     )
 
@@ -126,12 +124,6 @@ class CalaWaterHeater(CoordinatorEntity[CalaDataUpdateCoordinator], WaterHeaterE
             and self._heater_id in self.coordinator.data
             and self._heater_data.get("cloudConnected", True)
         )
-
-    async def async_set_temperature(self, **kwargs: Any) -> None:
-        """Set new target temperature."""
-        temperature = kwargs.get(ATTR_TEMPERATURE)
-        if temperature is not None:
-            await self.coordinator.async_set_temperature(self._heater_id, temperature)
 
     async def async_set_operation_mode(self, operation_mode: str) -> None:
         """Set new operation mode."""
