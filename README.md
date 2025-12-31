@@ -7,9 +7,11 @@ A Home Assistant custom integration for Cala heat pump water heaters. This integ
 
 ## Features
 
-- **Water Heater Entity**: Full control with temperature adjustment, operation modes, and boost mode
-- **Sensor Entities**: Monitor temperatures (tank, ambient, inlet, outlet), energy consumption, and water usage
-- **Binary Sensor Entities**: Track device connectivity and heating status
+- **Water Heater Entity**: Full control with temperature adjustment and operation modes
+- **Temperature Sensors**: Real-time monitoring of tank temperatures (top, upper, lower), ambient, inlet, outlet, and delivery temperatures
+- **Compressor Sensors**: Monitor compressor frequency, delivery/suction pressures
+- **Usage Sensors**: Track energy consumption, water usage, and hot water availability
+- **Binary Sensors**: Device connectivity, compressor running, fan running, safety lockout status
 
 ## Supported Devices
 
@@ -23,7 +25,7 @@ A Home Assistant custom integration for Cala heat pump water heaters. This integ
 2. Click on "Integrations"
 3. Click the three dots in the top right corner
 4. Select "Custom repositories"
-5. Add this repository URL: `https://github.com/RAR/Cala-HA`
+5. Add this repository URL: \`https://github.com/RAR/Cala-HA\`
 6. Select "Integration" as the category
 7. Click "Add"
 8. Search for "Cala Water Heater" and install it
@@ -32,7 +34,7 @@ A Home Assistant custom integration for Cala heat pump water heaters. This integ
 ### Manual Installation
 
 1. Download the latest release from the [releases page](https://github.com/RAR/Cala-HA/releases)
-2. Extract the `custom_components/cala` folder to your Home Assistant's `custom_components` directory
+2. Extract the \`custom_components/cala\` folder to your Home Assistant's \`custom_components\` directory
 3. Restart Home Assistant
 
 ## Configuration
@@ -41,8 +43,7 @@ A Home Assistant custom integration for Cala heat pump water heaters. This integ
 2. Click **+ Add Integration**
 3. Search for "Cala Water Heater"
 4. Enter your Cala app credentials (email and password)
-5. Select your home from the list
-6. Click **Submit**
+5. Click **Submit**
 
 ## Entities
 
@@ -50,39 +51,63 @@ A Home Assistant custom integration for Cala heat pump water heaters. This integ
 
 | Entity | Description |
 |--------|-------------|
-| `water_heater.cala_<device_name>` | Main water heater control entity |
+| \`water_heater.cala_<device_name>\` | Main water heater control entity |
 
 **Supported Features:**
-- Temperature control (95°F - 140°F / 35°C - 60°C)
-- Operation modes: Performance, Eco, Vacation
-- Boost mode (via `away_mode`)
+- Temperature control (35°C - 60°C / 95°F - 140°F)
+- Operation modes: Standard, Boost, Vacation, Eco
 
 ### Sensors
 
-| Entity | Description | Unit |
+| Sensor | Description | Unit |
 |--------|-------------|------|
-| `sensor.cala_<name>_tank_temperature` | Current tank water temperature | °F/°C |
-| `sensor.cala_<name>_ambient_temperature` | Ambient temperature around unit | °F/°C |
-| `sensor.cala_<name>_inlet_temperature` | Water inlet temperature | °F/°C |
-| `sensor.cala_<name>_outlet_temperature` | Water outlet temperature | °F/°C |
-| `sensor.cala_<name>_energy_consumption` | Energy used | kWh |
-| `sensor.cala_<name>_water_usage` | Hot water dispensed | Liters |
+| Top Tank Temperature | Temperature at top of tank (real-time) | °C |
+| Upper Tank Temperature | Temperature in upper section | °C |
+| Lower Tank Temperature | Temperature in lower section | °C |
+| Ambient Temperature | Air temperature around unit | °C |
+| Inlet Temperature | Cold water inlet temperature | °C |
+| Outlet Temperature | Hot water outlet temperature | °C |
+| Delivery Temperature | Refrigerant delivery temperature | °C |
+| Target Temperature | User-set desired temperature | °C |
+| Maximum Temperature Setting | User-set maximum temperature | °C |
+| Energy Used | Energy consumption | kWh |
+| Water Used | Total water used | L |
+| Hot Water Available | Estimated hot water available | L |
+| Uptime | Device uptime | seconds |
+| Compressor Frequency | Current compressor speed | Hz |
+| Delivery Pressure | Refrigerant high-side pressure | kPa |
+| Suction Pressure | Refrigerant low-side pressure | kPa |
+
+*Note: Temperature values are provided in Celsius and automatically converted by Home Assistant based on your display preferences.*
 
 ### Binary Sensors
 
-| Entity | Description |
+| Sensor | Description |
 |--------|-------------|
-| `binary_sensor.cala_<name>_connected` | Device connectivity status |
-| `binary_sensor.cala_<name>_heating` | Whether the unit is actively heating |
+| Connected | Device cloud connectivity status |
+| Compressor Running | Whether the compressor is currently running |
+| Fan Running | Whether the fan is currently running |
+| Safety Lockout | Safety lockout status (problem indicator) |
 
 ## Services
 
 The standard Home Assistant water heater services are supported:
 
-- `water_heater.set_temperature` - Set target temperature
-- `water_heater.set_operation_mode` - Set operation mode (performance, eco, vacation)
-- `water_heater.turn_away_mode_on` - Enable boost mode
-- `water_heater.turn_away_mode_off` - Disable boost mode
+- \`water_heater.set_temperature\` - Set target temperature
+- \`water_heater.set_operation_mode\` - Set operation mode (standard, boost, vacation, eco)
+
+### Operation Modes
+
+| Mode | Description |
+|------|-------------|
+| **standard** | Normal operation |
+| **boost** | Activates boost mode for 1 hour (higher priority heating) |
+| **vacation** | Activates vacation mode for 7 days (reduced heating) |
+| **eco** | Eco mode (placeholder - not yet fully implemented) |
+
+## Data Refresh
+
+The integration polls the Cala cloud API every **60 seconds** for updated sensor data. This includes both aggregated data (energy usage, water usage) and real-time data (temperatures, compressor status).
 
 ## Troubleshooting
 
@@ -92,19 +117,23 @@ The standard Home Assistant water heater services are supported:
 - Ensure your Home Assistant has internet access
 
 ### No sensor data
-- Some sensors may not appear until the device has been connected and sending data for a while
+- Some sensors may not appear until the device has been connected and sending data
 - Check the Cala app to verify the device is connected and reporting data
+
+### Sensors showing "Unknown"
+- Some sensors (like outlet temperature) may return null from the API if not available
+- Delete unavailable entities via Settings → Devices & Services → Entities
 
 ### Debug Logging
 
-To enable debug logging, add the following to your `configuration.yaml`:
+To enable debug logging, add the following to your \`configuration.yaml\`:
 
-```yaml
+\`\`\`yaml
 logger:
   default: info
   logs:
     custom_components.cala: debug
-```
+\`\`\`
 
 ## Requirements
 
