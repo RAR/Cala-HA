@@ -2,6 +2,7 @@
 output.js
 output.hasm
 test_connection.py
+test_api_queries.py
 
 # Python
 __pycache__/
@@ -13,6 +14,7 @@ __pycache__/
 .eggs/
 dist/
 build/
+.venv/
 
 # IDE
 .idea/
