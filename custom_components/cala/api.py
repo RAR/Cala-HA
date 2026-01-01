@@ -273,14 +273,20 @@ class CalaApiClient:
                         ambientTemp
                         compRunning
                         compFreq
+                        compPwr
                         deliveryTemp
                         deliveryPressure
                         suctionPressure
+                        suctionLineTemp
+                        superHeat
                         fanPwr
+                        defrost
+                        upperElementPwr
+                        lowerElementPwr
                     }
                 }
             }
-        """
+        "
 
         # Fetch both in parallel would be nice, but for simplicity do sequentially
         bucketed_result = await self._graphql_request(bucketed_query, {"deviceId": device_id})
@@ -289,12 +295,36 @@ class CalaApiClient:
         raw_result = await self._graphql_request(raw_query, {"deviceId": device_id})
         raw_items = raw_result.get("listSensorDataByDeviceIdAndTimestamp", {}).get("items", [])
 
+        # Get controls data (element states, setpoints)
+        controls_query = """
+            query GetLatestControls($deviceId: String!) {
+                listControlsByDeviceIdAndTimestamp(
+                    deviceId: $deviceId,
+                    sortDirection: DESC,
+                    limit: 1
+                ) {
+                    items {
+                        upperElement
+                        lowerElement
+                        upperSetPoint
+                        lowerSetPoint
+                        compSpeed
+                        shutoffTemp
+                    }
+                }
+            }
+        """
+        controls_result = await self._graphql_request(controls_query, {"deviceId": device_id})
+        controls_items = controls_result.get("listControlsByDeviceIdAndTimestamp", {}).get("items", [])
+
         # Merge the results
         data: dict[str, Any] = {}
         if bucketed_items:
             data.update(bucketed_items[0])
         if raw_items:
             data.update(raw_items[0])
+        if controls_items:
+            data.update(controls_items[0])
 
         return data
 
