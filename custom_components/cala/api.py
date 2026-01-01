@@ -298,89 +298,45 @@ class CalaApiClient:
 
         return data
 
-    async def get_daily_usage(
-        self, device_id: str, midnight_timestamp: float
+    async def get_daily_summary(
+        self, device_id: str, date_str: str
     ) -> dict[str, float]:
-        """Get total energy and water usage since midnight.
+        """Get daily energy and water usage summary from Cala's pre-calculated data.
         
         Args:
             device_id: The IoT device ID
-            midnight_timestamp: Epoch timestamp (milliseconds) for midnight local time
+            date_str: Date in YYYY-MM-DD format
             
         Returns:
             Dict with dailyEnergyUsed and dailyWaterUsed totals
         """
         query = """
-            query GetDailyUsage($deviceId: String!, $timestamp: ModelFloatKeyConditionInput) {
-                listBucketedSensorDataByDeviceIdAndTimestamp(
-                    deviceId: $deviceId,
-                    timestamp: $timestamp,
-                    sortDirection: ASC,
-                    limit: 100
-                ) {
-                    items {
-                        timestamp
-                        energyUsed
-                        litersUsed
-                    }
-                    nextToken
+            query GetDailyDeviceSummary($deviceId: ID!, $date: String!) {
+                getDailyDeviceSummary(deviceId: $deviceId, date: $date) {
+                    deviceId
+                    date
+                    energyUsed
+                    waterUsed
+                    createdAt
+                    updatedAt
                 }
             }
         """
 
-        total_energy = 0.0
-        total_water = 0.0
-        next_token = None
-        now_timestamp = datetime.now().timestamp() * 1000  # Current time in ms
+        try:
+            result = await self._graphql_request(
+                query, {"deviceId": device_id, "date": date_str}
+            )
+            summary = result.get("getDailyDeviceSummary")
+            if summary:
+                return {
+                    "dailyEnergyUsed": round(summary.get("energyUsed", 0.0), 3),
+                    "dailyWaterUsed": round(summary.get("waterUsed", 0.0), 3),
+                }
+        except CalaApiError as err:
+            _LOGGER.warning("Failed to get daily summary: %s", err)
 
-        # Paginate through all records since midnight
-        while True:
-            variables: dict[str, Any] = {
-                "deviceId": device_id,
-                "timestamp": {"between": [midnight_timestamp, now_timestamp]},
-            }
-            if next_token:
-                # Need to add nextToken to the query
-                paginated_query = """
-                    query GetDailyUsage($deviceId: String!, $timestamp: ModelFloatKeyConditionInput, $nextToken: String) {
-                        listBucketedSensorDataByDeviceIdAndTimestamp(
-                            deviceId: $deviceId,
-                            timestamp: $timestamp,
-                            sortDirection: ASC,
-                            limit: 100,
-                            nextToken: $nextToken
-                        ) {
-                            items {
-                                timestamp
-                                energyUsed
-                                litersUsed
-                            }
-                            nextToken
-                        }
-                    }
-                """
-                variables["nextToken"] = next_token
-                result = await self._graphql_request(paginated_query, variables)
-            else:
-                result = await self._graphql_request(query, variables)
-
-            data = result.get("listBucketedSensorDataByDeviceIdAndTimestamp", {})
-            items = data.get("items", [])
-
-            for item in items:
-                energy = item.get("energyUsed") or 0.0
-                water = item.get("litersUsed") or 0.0
-                total_energy += energy
-                total_water += water
-
-            next_token = data.get("nextToken")
-            if not next_token:
-                break
-
-        return {
-            "dailyEnergyUsed": round(total_energy, 3),
-            "dailyWaterUsed": round(total_water, 3),
-        }
+        return {"dailyEnergyUsed": 0.0, "dailyWaterUsed": 0.0}
 
     async def get_device_properties(self, device_id: str) -> dict[str, Any]:
         """Get device properties (firmware, network mode, etc.)."""

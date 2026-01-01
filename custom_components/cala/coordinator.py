@@ -97,7 +97,7 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         today: datetime,
         now: datetime,
     ) -> dict[str, float]:
-        """Get daily usage, fetching from API every 5 minutes or on date change."""
+        """Get daily usage from Cala's pre-calculated summary, caching for 5 minutes."""
         # Check if we need to refresh (date changed or 5 min elapsed)
         last_fetch = self._daily_usage_last_fetch.get(heater_id)
         cached_date = self._current_date.get(heater_id)
@@ -109,23 +109,23 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         
         if needs_refresh:
-            # Calculate midnight timestamp in milliseconds
-            midnight = dt_util.start_of_local_day(now)
-            midnight_ms = midnight.timestamp() * 1000
+            # Format date as YYYY-MM-DD for the API
+            date_str = today.strftime("%Y-%m-%d")
             
             try:
-                usage = await self.client.get_daily_usage(iot_id, midnight_ms)
+                usage = await self.client.get_daily_summary(iot_id, date_str)
                 self._daily_usage_cache[heater_id] = usage
                 self._daily_usage_last_fetch[heater_id] = now
                 self._current_date[heater_id] = today
                 _LOGGER.debug(
-                    "Fetched daily usage for %s: energy=%.3f kWh, water=%.1f L",
+                    "Fetched daily summary for %s (%s): energy=%.3f kWh, water=%.1f L",
                     heater_id,
+                    date_str,
                     usage.get("dailyEnergyUsed", 0),
                     usage.get("dailyWaterUsed", 0),
                 )
             except CalaApiError as err:
-                _LOGGER.warning("Failed to fetch daily usage: %s", err)
+                _LOGGER.warning("Failed to fetch daily summary: %s", err)
                 # Return cached data if available
                 if heater_id in self._daily_usage_cache:
                     return self._daily_usage_cache[heater_id]
