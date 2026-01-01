@@ -56,12 +56,6 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         name="Lower Element",
         device_class=BinarySensorDeviceClass.HEAT,
     ),
-    BinarySensorEntityDescription(
-        key="defrost",
-        name="Defrost Active",
-        device_class=BinarySensorDeviceClass.RUNNING,
-        entity_category=EntityCategory.DIAGNOSTIC,
-    ),
 )
 
 

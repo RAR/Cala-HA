@@ -273,16 +273,10 @@ class CalaApiClient:
                         ambientTemp
                         compRunning
                         compFreq
-                        compPwr
                         deliveryTemp
                         deliveryPressure
                         suctionPressure
-                        suctionLineTemp
-                        superHeat
                         fanPwr
-                        defrost
-                        upperElementPwr
-                        lowerElementPwr
                     }
                 }
             }
