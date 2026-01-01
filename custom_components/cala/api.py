@@ -802,21 +802,7 @@ class CalaApiClient:
             _LOGGER.warning("Unknown operation mode: %s", mode)
             return False
 
-    async def get_daily_summary(self, device_id: str, date: str) -> dict[str, Any]:
-        """Get daily device summary (date format: YYYY-MM-DD)."""
-        query = """
-            query GetDailyDeviceSummary($deviceId: ID!, $date: String!) {
-                getDailyDeviceSummary(deviceId: $deviceId, date: $date) {
-                    deviceId
-                    date
-                    energyUsed
-                    waterUsed
-                }
-            }
-        """
-
-        result = await self._graphql_request(query, {"deviceId": device_id, "date": date})
-        return result.get("getDailyDeviceSummary") or {}
+    # get_daily_summary is defined earlier in the class with proper key transformation
 
     async def get_energy_usage_history(
         self, device_id: str, limit: int = 7
