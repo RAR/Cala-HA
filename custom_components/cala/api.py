@@ -286,7 +286,7 @@ class CalaApiClient:
                     }
                 }
             }
-        "
+        """
 
         # Fetch both in parallel would be nice, but for simplicity do sequentially
         bucketed_result = await self._graphql_request(bucketed_query, {"deviceId": device_id})
