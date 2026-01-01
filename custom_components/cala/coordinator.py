@@ -14,6 +14,9 @@ from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+# Version marker to confirm correct code is loaded
+_LOGGER.info("Cala coordinator module loaded - version 2026-01-01-v2")
+
 
 class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Coordinator to manage fetching Cala water heater data."""
