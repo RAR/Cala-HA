@@ -327,6 +327,7 @@ class CalaApiClient:
             result = await self._graphql_request(
                 query, {"deviceId": device_id, "date": date_str}
             )
+            _LOGGER.debug("getDailyDeviceSummary result for %s/%s: %s", device_id, date_str, result)
             summary = result.get("getDailyDeviceSummary")
             if summary:
                 return {

@@ -94,7 +94,7 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self,
         heater_id: str,
         iot_id: str,
-        today: datetime,
+        today,  # date object
         now: datetime,
     ) -> dict[str, float]:
         """Get daily usage from Cala's pre-calculated summary, caching for 5 minutes."""
@@ -106,6 +106,11 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             last_fetch is None
             or cached_date != today
             or (now - last_fetch).total_seconds() >= 300  # 5 minutes
+        )
+        
+        _LOGGER.debug(
+            "Daily usage check for %s: needs_refresh=%s, last_fetch=%s, cached_date=%s",
+            heater_id, needs_refresh, last_fetch, cached_date
         )
         
         if needs_refresh:
