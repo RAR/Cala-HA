@@ -14,9 +14,6 @@ from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-# Version marker to confirm correct code is loaded
-_LOGGER.info("Cala coordinator module loaded - version 2026-01-01-v2")
-
 
 class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Coordinator to manage fetching Cala water heater data."""
@@ -126,11 +123,9 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if needs_refresh:
             # Format date as YYYY-MM-DD for the API
             date_str = today.strftime("%Y-%m-%d")
-            _LOGGER.info("Fetching daily summary from API for %s, date=%s, iot_id=%s", heater_id, date_str, iot_id)
             
             try:
                 usage = await self.client.get_daily_summary(iot_id, date_str)
-                _LOGGER.info("API returned daily summary: %s", usage)
                 self._daily_usage_cache[heater_id] = usage
                 self._daily_usage_last_fetch[heater_id] = now
                 self._current_date[heater_id] = today
