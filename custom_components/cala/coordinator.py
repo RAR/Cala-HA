@@ -32,12 +32,10 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         self.client = client
         self.water_heaters: dict[str, dict[str, Any]] = {}
-        # Daily usage tracking
-        self._daily_energy: dict[str, float] = {}
-        self._daily_water: dict[str, float] = {}
-        self._last_reset_date: dict[str, datetime] = {}
-        self._last_energy: dict[str, float] = {}
-        self._last_water: dict[str, float] = {}
+        # Cache for daily usage (updated less frequently)
+        self._daily_usage_cache: dict[str, dict[str, float]] = {}
+        self._daily_usage_last_fetch: dict[str, datetime] = {}
+        self._current_date: dict[str, datetime] = {}
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data from API."""
@@ -63,13 +61,13 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     
                     status = await self.client.get_water_heater_status(iot_id)
                     
-                    # Track daily usage
-                    self._update_daily_usage(heater_id, status, today)
+                    # Get daily usage from API (query historical data since midnight)
+                    daily_usage = await self._get_daily_usage(heater_id, iot_id, today, now)
                     
                     # Add daily totals to the status
-                    status["dailyEnergyUsed"] = self._daily_energy.get(heater_id, 0.0)
-                    status["dailyWaterUsed"] = self._daily_water.get(heater_id, 0.0)
-                    status["dailyResetTime"] = self._get_midnight_timestamp(heater_id)
+                    status["dailyEnergyUsed"] = daily_usage.get("dailyEnergyUsed", 0.0)
+                    status["dailyWaterUsed"] = daily_usage.get("dailyWaterUsed", 0.0)
+                    status["dailyResetTime"] = self._get_midnight_timestamp(today)
                     
                     data[heater_id] = {
                         **heater,
@@ -92,39 +90,56 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         except Exception as err:
             raise UpdateFailed(f"Unexpected error: {err}") from err
 
-    def _update_daily_usage(
-        self, heater_id: str, status: dict[str, Any], today: datetime
-    ) -> None:
-        """Update daily usage counters, resetting at midnight."""
-        # Check if we need to reset (new day)
-        last_reset = self._last_reset_date.get(heater_id)
-        if last_reset is None or last_reset != today:
-            # Reset daily counters
-            self._daily_energy[heater_id] = 0.0
-            self._daily_water[heater_id] = 0.0
-            self._last_reset_date[heater_id] = today
-            self._last_energy[heater_id] = 0.0
-            self._last_water[heater_id] = 0.0
-            _LOGGER.debug(
-                "Reset daily usage counters for %s at midnight", heater_id
-            )
+    async def _get_daily_usage(
+        self,
+        heater_id: str,
+        iot_id: str,
+        today: datetime,
+        now: datetime,
+    ) -> dict[str, float]:
+        """Get daily usage, fetching from API every 5 minutes or on date change."""
+        # Check if we need to refresh (date changed or 5 min elapsed)
+        last_fetch = self._daily_usage_last_fetch.get(heater_id)
+        cached_date = self._current_date.get(heater_id)
         
-        # Get current incremental values from the API
-        current_energy = status.get("energyUsed", 0.0) or 0.0
-        current_water = status.get("litersUsed", 0.0) or 0.0
+        needs_refresh = (
+            last_fetch is None
+            or cached_date != today
+            or (now - last_fetch).total_seconds() >= 300  # 5 minutes
+        )
         
-        # Add to daily totals (these are already incremental per period)
-        self._daily_energy[heater_id] += current_energy
-        self._daily_water[heater_id] += current_water
+        if needs_refresh:
+            # Calculate midnight timestamp in milliseconds
+            midnight = dt_util.start_of_local_day(now)
+            midnight_ms = midnight.timestamp() * 1000
+            
+            try:
+                usage = await self.client.get_daily_usage(iot_id, midnight_ms)
+                self._daily_usage_cache[heater_id] = usage
+                self._daily_usage_last_fetch[heater_id] = now
+                self._current_date[heater_id] = today
+                _LOGGER.debug(
+                    "Fetched daily usage for %s: energy=%.3f kWh, water=%.1f L",
+                    heater_id,
+                    usage.get("dailyEnergyUsed", 0),
+                    usage.get("dailyWaterUsed", 0),
+                )
+            except CalaApiError as err:
+                _LOGGER.warning("Failed to fetch daily usage: %s", err)
+                # Return cached data if available
+                if heater_id in self._daily_usage_cache:
+                    return self._daily_usage_cache[heater_id]
+                return {"dailyEnergyUsed": 0.0, "dailyWaterUsed": 0.0}
+        
+        return self._daily_usage_cache.get(
+            heater_id, {"dailyEnergyUsed": 0.0, "dailyWaterUsed": 0.0}
+        )
 
-    def _get_midnight_timestamp(self, heater_id: str) -> datetime | None:
-        """Get the timestamp of when daily counters were last reset."""
-        reset_date = self._last_reset_date.get(heater_id)
-        if reset_date:
-            return dt_util.start_of_local_day(
-                datetime.combine(reset_date, datetime.min.time())
-            )
-        return None
+    def _get_midnight_timestamp(self, today: datetime) -> datetime:
+        """Get the timestamp for midnight today."""
+        return dt_util.start_of_local_day(
+            datetime.combine(today, datetime.min.time())
+        )
 
     async def async_set_temperature(
         self, heater_id: str, temperature: float
