@@ -69,6 +69,13 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     status["dailyWaterUsed"] = daily_usage.get("dailyWaterUsed", 0.0)
                     status["dailyResetTime"] = self._get_midnight_timestamp(today)
                     
+                    _LOGGER.info(
+                        "Heater %s daily usage: energy=%.3f kWh, water=%.1f L",
+                        heater_id,
+                        status["dailyEnergyUsed"],
+                        status["dailyWaterUsed"],
+                    )
+                    
                     data[heater_id] = {
                         **heater,
                         **status,
