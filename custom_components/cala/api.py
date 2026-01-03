@@ -736,23 +736,24 @@ class CalaApiClient:
             return False
 
     async def set_operation_mode(
-        self, water_heater_id: str, mode: str, group_id: str | None = None, home_id: str | None = None
+        self, water_heater_id: str, mode: str, group_id: str | None = None, 
+        home_id: str | None = None, duration: int | None = None
     ) -> bool:
         """Set operation mode for a water heater.
         
         Modes:
         - standard: Cancel any active boost/vacation modes
-        - boost: Activate boost mode for 1 hour
-        - vacation: Activate vacation mode for 7 days
-        - eco: Set a lower target temperature (not yet implemented)
+        - boost: Activate boost mode (default 4 hours, or specified duration in hours)
+        - vacation: Activate vacation mode (default 7 days, or specified duration in days)
         """
         from datetime import datetime
         
         now = int(datetime.now().timestamp())
         
         if mode == "boost":
-            # Create a 1-hour boost mode
-            end_time = now + (60 * 60)  # 1 hour
+            # Create a boost mode with specified duration (default 4 hours)
+            hours = duration if duration is not None else 4
+            end_time = now + (hours * 60 * 60)
             
             mutation = """
                 mutation CreateBoostMode($input: CreateBoostModeInput!) {
@@ -780,8 +781,9 @@ class CalaApiClient:
                 return False
                 
         elif mode == "vacation":
-            # Create a 7-day vacation mode
-            end_time = now + (7 * 24 * 60 * 60)  # 7 days
+            # Create a vacation mode with specified duration (default 7 days)
+            days = duration if duration is not None else 7
+            end_time = now + (days * 24 * 60 * 60)
             
             mutation = """
                 mutation CreateVacation($input: CreateVacationInput!) {

@@ -21,19 +21,10 @@ from .const import (
     DOMAIN,
     MAX_TEMP,
     MIN_TEMP,
-    OPERATION_MODE_BOOST,
-    OPERATION_MODE_STANDARD,
-    OPERATION_MODE_VACATION,
 )
 from .coordinator import CalaDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
-
-OPERATION_LIST = [
-    OPERATION_MODE_STANDARD,
-    OPERATION_MODE_BOOST,
-    OPERATION_MODE_VACATION,
-]
 
 
 async def async_setup_entry(
@@ -60,11 +51,7 @@ class CalaWaterHeater(CoordinatorEntity[CalaDataUpdateCoordinator], WaterHeaterE
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_min_temp = MIN_TEMP
     _attr_max_temp = MAX_TEMP
-    _attr_operation_list = OPERATION_LIST
-    _attr_supported_features = (
-        WaterHeaterEntityFeature.OPERATION_MODE
-        | WaterHeaterEntityFeature.ON_OFF
-    )
+    _attr_supported_features = WaterHeaterEntityFeature.ON_OFF
 
     def __init__(
         self,
@@ -100,21 +87,6 @@ class CalaWaterHeater(CoordinatorEntity[CalaDataUpdateCoordinator], WaterHeaterE
         return self._heater_data.get("userDesiredTemp")
 
     @property
-    def current_operation(self) -> str:
-        """Return current operation mode."""
-        if self._heater_data.get("vacationMode"):
-            return OPERATION_MODE_VACATION
-        if self._heater_data.get("boostStatus"):
-            return OPERATION_MODE_BOOST
-        # Default to standard mode
-        return OPERATION_MODE_STANDARD
-
-    @property
-    def is_away_mode_on(self) -> bool:
-        """Return if away mode (vacation) is on."""
-        return self._heater_data.get("vacationMode", False)
-
-    @property
     def available(self) -> bool:
         """Return if entity is available."""
         return (
@@ -123,10 +95,6 @@ class CalaWaterHeater(CoordinatorEntity[CalaDataUpdateCoordinator], WaterHeaterE
             and self._heater_data.get("cloudConnected", True)
         )
 
-    async def async_set_operation_mode(self, operation_mode: str) -> None:
-        """Set new operation mode."""
-        await self.coordinator.async_set_operation_mode(self._heater_id, operation_mode)
-
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the water heater on."""
         await self.coordinator.async_turn_on(self._heater_id)
@@ -134,15 +102,3 @@ class CalaWaterHeater(CoordinatorEntity[CalaDataUpdateCoordinator], WaterHeaterE
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the water heater off (vacation mode)."""
         await self.coordinator.async_turn_off(self._heater_id)
-
-    async def async_turn_away_mode_on(self) -> None:
-        """Turn away mode on."""
-        await self.coordinator.async_set_operation_mode(
-            self._heater_id, OPERATION_MODE_VACATION
-        )
-
-    async def async_turn_away_mode_off(self) -> None:
-        """Turn away mode off."""
-        await self.coordinator.async_set_operation_mode(
-            self._heater_id, OPERATION_MODE_STANDARD
-        )
