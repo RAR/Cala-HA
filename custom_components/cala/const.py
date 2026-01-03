@@ -19,7 +19,6 @@ MAX_TEMP: Final = 60  # Celsius
 
 # Water heater modes
 OPERATION_MODE_STANDARD: Final = "standard"
-OPERATION_MODE_ECO: Final = "eco"
 OPERATION_MODE_VACATION: Final = "vacation"
 OPERATION_MODE_BOOST: Final = "boost"
 

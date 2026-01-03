@@ -132,7 +132,7 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         key="deliveryPressure",
-        name="Delivery Pressure",
+        name="Discharge Pressure",
         native_unit_of_measurement="kPa",
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
