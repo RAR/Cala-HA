@@ -47,6 +47,12 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     BinarySensorEntityDescription(
+        key="compPwr",
+        name="Compressor Power",
+        device_class=BinarySensorDeviceClass.RUNNING,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    BinarySensorEntityDescription(
         key="upperElement",
         name="Upper Element",
         device_class=BinarySensorDeviceClass.HEAT,
@@ -55,6 +61,18 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         key="lowerElement",
         name="Lower Element",
         device_class=BinarySensorDeviceClass.HEAT,
+    ),
+    BinarySensorEntityDescription(
+        key="upperElementPwr",
+        name="Upper Element Power",
+        device_class=BinarySensorDeviceClass.POWER,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    BinarySensorEntityDescription(
+        key="lowerElementPwr",
+        name="Lower Element Power",
+        device_class=BinarySensorDeviceClass.POWER,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     BinarySensorEntityDescription(
         key="boostModeActive",

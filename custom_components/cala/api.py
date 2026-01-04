@@ -271,12 +271,31 @@ class CalaApiClient:
                         lowerTankTemp
                         outletTemp
                         ambientTemp
+                        ambientHumidity
                         compRunning
                         compFreq
+                        compAcceleration
+                        compCurrent
+                        compVoltage
+                        compPwr
                         deliveryTemp
                         deliveryPressure
                         suctionPressure
+                        dischargeTemp
+                        exvPos
                         fanPwr
+                        flowRate
+                        liquidLineTemp
+                        suctionLineTemp
+                        superHeat
+                        topTankRawTemp
+                        upperTankRawTemp
+                        lowerTankRawTemp
+                        upperElementPwr
+                        lowerElementPwr
+                        compFlags
+                        lockout
+                        safetyLockout
                     }
                 }
             }
@@ -303,6 +322,7 @@ class CalaApiClient:
                         upperSetPoint
                         lowerSetPoint
                         compSpeed
+                        compAccel
                         shutoffTemp
                     }
                 }
