@@ -492,6 +492,7 @@ class CalaApiClient:
                         waterHeaterId
                         startDate
                         endDate
+                        cancelDate
                     }
                 }
             }
@@ -503,7 +504,8 @@ class CalaApiClient:
         })
         items = result.get("listBoostModeByWaterHeaterIdAndEndDate", {}).get("items", [])
 
-        if items:
+        # Return only if not cancelled
+        if items and items[0].get("cancelDate") is None:
             return items[0]
         return None
 
