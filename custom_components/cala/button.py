@@ -29,6 +29,11 @@ BUTTON_DESCRIPTIONS: tuple[ButtonEntityDescription, ...] = (
         icon="mdi:rocket-launch",
     ),
     ButtonEntityDescription(
+        key="cancel_boost",
+        name="Cancel Boost",
+        icon="mdi:cancel",
+    ),
+    ButtonEntityDescription(
         key="vacation_mode",
         name="Vacation Mode",
         icon="mdi:airplane",
@@ -92,6 +97,8 @@ class CalaModeButton(CoordinatorEntity[CalaDataUpdateCoordinator], ButtonEntity)
             duration_hours = self.hass.states.get(number_entity_id)
             hours = int(duration_hours.state) if duration_hours else 4  # Default 4 hours
             await self.coordinator.async_set_operation_mode(self._heater_id, "boost", hours)
+        elif key == "cancel_boost":
+            await self.coordinator.async_cancel_boost(self._heater_id)
         elif key == "vacation_mode":
             # Get vacation duration from number entity
             number_entity_id = f"number.{self._attr_device_info['name'].lower().replace(' ', '_')}_vacation_duration"

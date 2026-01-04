@@ -195,6 +195,17 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.error("Failed to set operation mode: %s", err)
             return False
 
+    async def async_cancel_boost(self, heater_id: str) -> bool:
+        """Cancel boost mode for a water heater."""
+        try:
+            success = await self.client.cancel_boost_mode(heater_id)
+            if success:
+                await self.async_request_refresh()
+            return success
+        except CalaApiError as err:
+            _LOGGER.error("Failed to cancel boost mode: %s", err)
+            return False
+
     async def async_turn_on(self, heater_id: str) -> bool:
         """Turn on a water heater."""
         try:

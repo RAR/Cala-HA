@@ -828,6 +828,36 @@ class CalaApiClient:
             _LOGGER.warning("Unknown operation mode: %s", mode)
             return False
 
+    async def cancel_boost_mode(self, water_heater_id: str) -> bool:
+        """Cancel active boost mode."""
+        try:
+            # Get the active boost mode
+            boost = await self.get_boost_mode(water_heater_id)
+            if not boost:
+                _LOGGER.info("No active boost mode to cancel")
+                return True
+            
+            boost_id = boost.get("id")
+            if not boost_id:
+                _LOGGER.error("Boost mode has no ID")
+                return False
+            
+            mutation = """
+                mutation DeleteBoostMode($input: DeleteBoostModeInput!) {
+                    deleteBoostMode(input: $input) {
+                        id
+                    }
+                }
+            """
+            
+            await self._graphql_request(mutation, {"input": {"id": boost_id}})
+            _LOGGER.info("Cancelled boost mode %s", boost_id)
+            return True
+            
+        except CalaApiError as err:
+            _LOGGER.error("Failed to cancel boost mode: %s", err)
+            return False
+
     # get_daily_summary is defined earlier in the class with proper key transformation
 
     async def get_energy_usage_history(
