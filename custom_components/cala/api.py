@@ -492,8 +492,6 @@ class CalaApiClient:
                         waterHeaterId
                         startDate
                         endDate
-                        targetTemp
-                        active
                     }
                 }
             }
@@ -526,7 +524,6 @@ class CalaApiClient:
                         homeId
                         startDate
                         endDate
-                        active
                     }
                 }
             }
