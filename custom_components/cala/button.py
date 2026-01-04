@@ -19,11 +19,6 @@ _LOGGER = logging.getLogger(__name__)
 
 BUTTON_DESCRIPTIONS: tuple[ButtonEntityDescription, ...] = (
     ButtonEntityDescription(
-        key="standard_mode",
-        name="Standard Mode",
-        icon="mdi:water-boiler",
-    ),
-    ButtonEntityDescription(
         key="boost_mode",
         name="Boost Mode",
         icon="mdi:rocket-launch",
@@ -94,9 +89,7 @@ class CalaModeButton(CoordinatorEntity[CalaDataUpdateCoordinator], ButtonEntity)
         """Handle the button press."""
         key = self.entity_description.key
         
-        if key == "standard_mode":
-            await self.coordinator.async_set_operation_mode(self._heater_id, "standard")
-        elif key == "boost_mode":
+        if key == "boost_mode":
             # Get boost duration from number entity
             number_entity_id = f"number.{self._attr_device_info['name'].lower().replace(' ', '_')}_boost_duration"
             duration_hours = self.hass.states.get(number_entity_id)

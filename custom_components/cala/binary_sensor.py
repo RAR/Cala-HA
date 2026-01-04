@@ -56,6 +56,16 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         name="Lower Element",
         device_class=BinarySensorDeviceClass.HEAT,
     ),
+    BinarySensorEntityDescription(
+        key="boostModeActive",
+        name="Boost Mode Active",
+        icon="mdi:rocket-launch",
+    ),
+    BinarySensorEntityDescription(
+        key="vacationModeActive",
+        name="Vacation Mode Active",
+        icon="mdi:airplane",
+    ),
 )
 
 

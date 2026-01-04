@@ -69,6 +69,12 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     status["dailyWaterUsed"] = daily_usage.get("dailyWaterUsed", 0.0)
                     status["dailyResetTime"] = self._get_midnight_timestamp(today)
                     
+                    # Check for active boost/vacation modes
+                    boost = await self.client.get_boost_mode(heater_id)
+                    vacation = await self.client.get_vacation_mode(heater.get("homeId"))
+                    status["boostModeActive"] = boost is not None
+                    status["vacationModeActive"] = vacation is not None
+                    
                     _LOGGER.info(
                         "Heater %s daily usage: energy=%.3f kWh, water=%.1f L",
                         heater_id,
