@@ -84,6 +84,12 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         name="Vacation Mode Active",
         icon="mdi:airplane",
     ),
+    BinarySensorEntityDescription(
+        key="sidewalkAvailable",
+        name="Sidewalk Available",
+        icon="mdi:radio-tower",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
 )
 
 

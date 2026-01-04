@@ -61,6 +61,9 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     
                     status = await self.client.get_water_heater_status(iot_id)
                     
+                    # Get device properties
+                    properties = await self.client.get_device_properties(iot_id)
+                    
                     # Get daily usage from API (query historical data since midnight)
                     daily_usage = await self._get_daily_usage(heater_id, iot_id, today, now)
                     
@@ -85,6 +88,7 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     data[heater_id] = {
                         **heater,
                         **status,
+                        **properties,
                     }
                 except CalaApiError as err:
                     _LOGGER.warning(
