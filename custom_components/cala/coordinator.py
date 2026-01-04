@@ -206,6 +206,23 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.error("Failed to cancel boost mode: %s", err)
             return False
 
+    async def async_cancel_vacation(self, heater_id: str) -> bool:
+        """Cancel vacation mode for a water heater."""
+        try:
+            # Vacation uses home_id, get it from the heater
+            if heater_id in self.data:
+                home_id = self.data[heater_id]["water_heater"].get("homeId")
+                if home_id:
+                    success = await self.client.cancel_vacation_mode(home_id)
+                    if success:
+                        await self.async_request_refresh()
+                    return success
+            _LOGGER.error("Could not find home_id for heater %s", heater_id)
+            return False
+        except CalaApiError as err:
+            _LOGGER.error("Failed to cancel vacation mode: %s", err)
+            return False
+
     async def async_turn_on(self, heater_id: str) -> bool:
         """Turn on a water heater."""
         try:

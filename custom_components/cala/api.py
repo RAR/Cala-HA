@@ -858,6 +858,36 @@ class CalaApiClient:
             _LOGGER.error("Failed to cancel boost mode: %s", err)
             return False
 
+    async def cancel_vacation_mode(self, home_id: str) -> bool:
+        """Cancel active vacation mode."""
+        try:
+            # Get the active vacation mode
+            vacation = await self.get_vacation_mode(home_id)
+            if not vacation:
+                _LOGGER.info("No active vacation mode to cancel")
+                return True
+            
+            vacation_id = vacation.get("id")
+            if not vacation_id:
+                _LOGGER.error("Vacation mode has no ID")
+                return False
+            
+            mutation = """
+                mutation DeleteVacation($input: DeleteVacationInput!) {
+                    deleteVacation(input: $input) {
+                        id
+                    }
+                }
+            """
+            
+            await self._graphql_request(mutation, {"input": {"id": vacation_id}})
+            _LOGGER.info("Cancelled vacation mode %s", vacation_id)
+            return True
+            
+        except CalaApiError as err:
+            _LOGGER.error("Failed to cancel vacation mode: %s", err)
+            return False
+
     # get_daily_summary is defined earlier in the class with proper key transformation
 
     async def get_energy_usage_history(
