@@ -51,7 +51,7 @@ class CalaWaterHeater(CoordinatorEntity[CalaDataUpdateCoordinator], WaterHeaterE
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_min_temp = MIN_TEMP
     _attr_max_temp = MAX_TEMP
-    _attr_supported_features = WaterHeaterEntityFeature.ON_OFF
+    _attr_supported_features = 0
 
     def __init__(
         self,
@@ -94,11 +94,3 @@ class CalaWaterHeater(CoordinatorEntity[CalaDataUpdateCoordinator], WaterHeaterE
             and self._heater_id in self.coordinator.data
             and self._heater_data.get("cloudConnected", True)
         )
-
-    async def async_turn_on(self, **kwargs: Any) -> None:
-        """Turn the water heater on."""
-        await self.coordinator.async_turn_on(self._heater_id)
-
-    async def async_turn_off(self, **kwargs: Any) -> None:
-        """Turn the water heater off (vacation mode)."""
-        await self.coordinator.async_turn_off(self._heater_id)

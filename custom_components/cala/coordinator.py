@@ -232,25 +232,3 @@ class CalaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         except CalaApiError as err:
             _LOGGER.error("Failed to cancel vacation mode: %s", err)
             return False
-
-    async def async_turn_on(self, heater_id: str) -> bool:
-        """Turn on a water heater."""
-        try:
-            success = await self.client.turn_on(heater_id)
-            if success:
-                await self.async_request_refresh()
-            return success
-        except CalaApiError as err:
-            _LOGGER.error("Failed to turn on water heater: %s", err)
-            return False
-
-    async def async_turn_off(self, heater_id: str) -> bool:
-        """Turn off a water heater (vacation mode)."""
-        try:
-            success = await self.client.turn_off(heater_id)
-            if success:
-                await self.async_request_refresh()
-            return success
-        except CalaApiError as err:
-            _LOGGER.error("Failed to turn off water heater: %s", err)
-            return False
