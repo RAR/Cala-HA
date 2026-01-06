@@ -90,9 +90,9 @@ class CalaDurationNumber(CoordinatorEntity[CalaDataUpdateCoordinator], NumberEnt
         
         # Set default values
         if description.key == "boost_duration":
-            self._attr_native_value = 4.0  # 4 hours default
+            self._attr_native_value = 4  # 4 hours default
         elif description.key == "vacation_duration":
-            self._attr_native_value = 7.0  # 7 days default
+            self._attr_native_value = 7  # 7 days default
 
     async def async_added_to_hass(self) -> None:
         """Restore last state."""
@@ -100,9 +100,9 @@ class CalaDurationNumber(CoordinatorEntity[CalaDataUpdateCoordinator], NumberEnt
         
         if (last_state := await self.async_get_last_state()) is not None:
             if last_state.state not in (None, "unknown", "unavailable"):
-                self._attr_native_value = float(last_state.state)
+                self._attr_native_value = int(float(last_state.state))
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
-        self._attr_native_value = value
+        self._attr_native_value = int(value)
         self.async_write_ha_state()
