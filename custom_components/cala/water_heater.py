@@ -70,6 +70,7 @@ class CalaWaterHeater(CoordinatorEntity[CalaDataUpdateCoordinator], WaterHeaterE
             "model": heater_data.get("model", "Heat Pump Water Heater"),
             "sw_version": heater_data.get("firmware_version"),
         }
+        self._attr_icon = "mdi:water-boiler"
 
     @property
     def _heater_data(self) -> dict[str, Any]:
