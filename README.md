@@ -27,7 +27,7 @@ A Home Assistant custom integration for Cala heat pump water heaters. This integ
 2. Click on "Integrations"
 3. Click the three dots in the top right corner
 4. Select "Custom repositories"
-5. Add this repository URL: \`https://github.com/RAR/Cala-HA\`
+5. Add this repository URL: `https://github.com/RAR/Cala-HA`
 6. Select "Integration" as the category
 7. Click "Add"
 8. Search for "Cala Water Heater" and install it
@@ -36,7 +36,7 @@ A Home Assistant custom integration for Cala heat pump water heaters. This integ
 ### Manual Installation
 
 1. Download the latest release from the [releases page](https://github.com/RAR/Cala-HA/releases)
-2. Extract the \`custom_components/cala\` folder to your Home Assistant's \`custom_components\` directory
+2. Extract the `custom_components/cala` folder to your Home Assistant's `custom_components` directory
 3. Restart Home Assistant
 
 ## Configuration
@@ -53,7 +53,7 @@ A Home Assistant custom integration for Cala heat pump water heaters. This integ
 
 | Entity | Description |
 |--------|-------------|
-| \`water_heater.cala_<device_name>\` | Main water heater control entity |
+| `water_heater.cala_<device_name>` | Main water heater control entity |
 
 **Supported Features:**
 - Temperature control (35°C - 60°C / 95°F - 140°F)
@@ -95,8 +95,8 @@ A Home Assistant custom integration for Cala heat pump water heaters. This integ
 
 The standard Home Assistant water heater services are supported:
 
-- \`water_heater.set_temperature\` - Set target temperature
-- \`water_heater.set_operation_mode\` - Set operation mode (standard, boost, vacation, eco)
+- `water_heater.set_temperature` - Set target temperature
+- `water_heater.set_operation_mode` - Set operation mode (standard, boost, vacation, eco)
 
 ### Operation Modes
 
@@ -128,14 +128,14 @@ The integration polls the Cala cloud API every **60 seconds** for updated sensor
 
 ### Debug Logging
 
-To enable debug logging, add the following to your \`configuration.yaml\`:
+To enable debug logging, add the following to your `configuration.yaml`:
 
-\`\`\`yaml
+```yaml
 logger:
   default: info
   logs:
     custom_components.cala: debug
-\`\`\`
+```
 
 ## Requirements
 
