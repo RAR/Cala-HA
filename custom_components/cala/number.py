@@ -90,7 +90,7 @@ class CalaDurationNumber(CoordinatorEntity[CalaDataUpdateCoordinator], NumberEnt
         
         # Set default values
         if description.key == "boost_duration":
-            self._attr_native_value = 4  # 4 hours default
+            self._attr_native_value = 5  # 5 hours default
         elif description.key == "vacation_duration":
             self._attr_native_value = 7  # 7 days default
 
