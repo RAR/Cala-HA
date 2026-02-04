@@ -405,6 +405,8 @@ class CalaSensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity):
         self._heater_id = heater_id
         self.entity_description = description
         self._attr_unique_id = f"cala_{heater_id}_{description.key}"
+        if hasattr(description, 'entity_registry_enabled_default'):
+            self._attr_entity_registry_enabled_default = description.entity_registry_enabled_default
         self._attr_device_info = {
             "identifiers": {(DOMAIN, heater_id)},
             "name": heater_data.get("name", "Cala Water Heater"),
@@ -434,6 +436,13 @@ class CalaSensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity):
             and self._heater_id in self.coordinator.data
         )
 
+    @property
+    def entity_registry_enabled_default(self) -> bool:
+        """Return if the entity should be enabled when first added to the registry."""
+        if hasattr(self.entity_description, 'entity_registry_enabled_default'):
+            return self.entity_description.entity_registry_enabled_default
+        return True
+
 
 class CalaDailySensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity):
     """Representation of a Cala daily usage sensor that resets at midnight."""
@@ -452,6 +461,8 @@ class CalaDailySensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity
         self._heater_id = heater_id
         self.entity_description = description
         self._attr_unique_id = f"cala_{heater_id}_{description.key}"
+        if hasattr(description, 'entity_registry_enabled_default'):
+            self._attr_entity_registry_enabled_default = description.entity_registry_enabled_default
         self._attr_device_info = {
             "identifiers": {(DOMAIN, heater_id)},
             "name": heater_data.get("name", "Cala Water Heater"),
@@ -488,3 +499,9 @@ class CalaDailySensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity
             and self.coordinator.data is not None
             and self._heater_id in self.coordinator.data
         )
+    @property
+    def entity_registry_enabled_default(self) -> bool:
+        \"\"\"Return if the entity should be enabled when first added to the registry.\"\"\"
+        if hasattr(self.entity_description, 'entity_registry_enabled_default'):
+            return self.entity_description.entity_registry_enabled_default
+        return True
