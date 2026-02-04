@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, sanitize_entity_id
 from .coordinator import CalaDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -76,7 +76,7 @@ class CalaModeButton(CoordinatorEntity[CalaDataUpdateCoordinator], ButtonEntity)
         super().__init__(coordinator)
         self._heater_id = heater_id
         self.entity_description = description
-        self._attr_unique_id = f"cala_{heater_id}_{description.key}"
+        self._attr_unique_id = f"cala_{sanitize_entity_id(heater_id)}_{description.key}"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, heater_id)},
             "name": heater_data.get("name", "Cala Water Heater"),

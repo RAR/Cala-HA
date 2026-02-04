@@ -62,7 +62,7 @@ class CalaWaterHeater(CoordinatorEntity[CalaDataUpdateCoordinator], WaterHeaterE
         """Initialize the water heater entity."""
         super().__init__(coordinator)
         self._heater_id = heater_id
-        self._attr_unique_id = f"cala_{heater_id}"
+        self._attr_unique_id = f"cala_{sanitize_entity_id(heater_id)}"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, heater_id)},
             "name": heater_data.get("name", "Cala Water Heater"),

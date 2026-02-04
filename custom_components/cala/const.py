@@ -1,6 +1,7 @@
 """Constants for the Cala Water Heater integration."""
 from __future__ import annotations
 
+import re
 from typing import Final
 
 DOMAIN: Final = "cala"
@@ -39,3 +40,20 @@ GQL_CREATE_WATER_HEATER: Final = "CreateWaterHeaterWithThingReturnType"
 # Device info
 MANUFACTURER: Final = "Cala Systems"
 MODEL: Final = "Heat Pump Water Heater"
+
+
+def sanitize_entity_id(entity_id: str) -> str:
+    """Sanitize entity ID to be lowercase with underscores only.
+    
+    Home Assistant requires entity IDs to be lowercase and only contain
+    letters, numbers, and underscores.
+    """
+    # Convert to lowercase
+    entity_id = entity_id.lower()
+    # Replace any non-alphanumeric characters (except underscores) with underscores
+    entity_id = re.sub(r'[^a-z0-9_]', '_', entity_id)
+    # Replace multiple consecutive underscores with a single underscore
+    entity_id = re.sub(r'_+', '_', entity_id)
+    # Remove leading/trailing underscores
+    entity_id = entity_id.strip('_')
+    return entity_id

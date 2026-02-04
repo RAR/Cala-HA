@@ -22,7 +22,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, sanitize_entity_id
 from .coordinator import CalaDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -403,7 +403,7 @@ class CalaSensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity):
         """Initialize the sensor entity."""
         self._heater_id = heater_id
         self.entity_description = description
-        self._attr_unique_id = f"cala_{heater_id}_{description.key}"
+        self._attr_unique_id = f"cala_{sanitize_entity_id(heater_id)}_{description.key}"
         
         # Set enabled default before parent init
         if hasattr(description, 'entity_registry_enabled_default'):
@@ -456,7 +456,7 @@ class CalaDailySensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity
         """Initialize the daily sensor entity."""
         self._heater_id = heater_id
         self.entity_description = description
-        self._attr_unique_id = f"cala_{heater_id}_{description.key}"
+        self._attr_unique_id = f"cala_{sanitize_entity_id(heater_id)}_{description.key}"
         
         # Set enabled default before parent init
         if hasattr(description, 'entity_registry_enabled_default'):
