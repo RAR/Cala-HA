@@ -405,8 +405,7 @@ class CalaSensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity):
         self._heater_id = heater_id
         self.entity_description = description
         self._attr_unique_id = f"cala_{heater_id}_{description.key}"
-        if hasattr(description, 'entity_registry_enabled_default'):
-            self._attr_entity_registry_enabled_default = description.entity_registry_enabled_default
+
         self._attr_device_info = {
             "identifiers": {(DOMAIN, heater_id)},
             "name": heater_data.get("name", "Cala Water Heater"),
@@ -461,8 +460,7 @@ class CalaDailySensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity
         self._heater_id = heater_id
         self.entity_description = description
         self._attr_unique_id = f"cala_{heater_id}_{description.key}"
-        if hasattr(description, 'entity_registry_enabled_default'):
-            self._attr_entity_registry_enabled_default = description.entity_registry_enabled_default
+
         self._attr_device_info = {
             "identifiers": {(DOMAIN, heater_id)},
             "name": heater_data.get("name", "Cala Water Heater"),
