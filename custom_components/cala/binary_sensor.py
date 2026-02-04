@@ -130,10 +130,14 @@ class CalaBinarySensor(CoordinatorEntity[CalaDataUpdateCoordinator], BinarySenso
         description: BinarySensorEntityDescription,
     ) -> None:
         """Initialize the binary sensor entity."""
-        super().__init__(coordinator)
         self._heater_id = heater_id
         self.entity_description = description
         self._attr_unique_id = f"cala_{heater_id}_{description.key}"
+        
+        # Set enabled default before parent init
+        if hasattr(description, 'entity_registry_enabled_default'):
+            self._attr_entity_registry_enabled_default = description.entity_registry_enabled_default
+        
         self._attr_device_info = {
             "identifiers": {(DOMAIN, heater_id)},
             "name": heater_data.get("name", "Cala Water Heater"),
@@ -141,6 +145,8 @@ class CalaBinarySensor(CoordinatorEntity[CalaDataUpdateCoordinator], BinarySenso
             "model": heater_data.get("model", "Heat Pump Water Heater"),
             "sw_version": heater_data.get("firmware_version"),
         }
+        
+        super().__init__(coordinator)
 
     @property
     def _heater_data(self) -> dict[str, Any]:
@@ -168,10 +174,3 @@ class CalaBinarySensor(CoordinatorEntity[CalaDataUpdateCoordinator], BinarySenso
             and self.coordinator.data is not None
             and self._heater_id in self.coordinator.data
         )
-
-    @property
-    def entity_registry_enabled_default(self) -> bool:
-        """Return if the entity should be enabled when first added to the registry."""
-        if hasattr(self.entity_description, 'entity_registry_enabled_default'):
-            return self.entity_description.entity_registry_enabled_default
-        return True
