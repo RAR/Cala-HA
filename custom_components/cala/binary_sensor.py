@@ -177,10 +177,3 @@ class CalaBinarySensor(CoordinatorEntity[CalaDataUpdateCoordinator], BinarySenso
         if hasattr(self.entity_description, 'entity_registry_enabled_default'):
             return self.entity_description.entity_registry_enabled_default
         return True
-
-    @property
-    def entity_registry_enabled_default(self) -> bool:
-        """Return if the entity should be enabled when first added to the registry."""
-        if hasattr(self.entity_description, 'entity_registry_enabled_default'):
-            return self.entity_description.entity_registry_enabled_default
-        return True

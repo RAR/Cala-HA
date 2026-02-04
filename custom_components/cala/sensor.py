@@ -499,9 +499,10 @@ class CalaDailySensor(CoordinatorEntity[CalaDataUpdateCoordinator], SensorEntity
             and self.coordinator.data is not None
             and self._heater_id in self.coordinator.data
         )
+
     @property
     def entity_registry_enabled_default(self) -> bool:
-        \"\"\"Return if the entity should be enabled when first added to the registry.\"\"\"
+        """Return if the entity should be enabled when first added to the registry."""
         if hasattr(self.entity_description, 'entity_registry_enabled_default'):
             return self.entity_description.entity_registry_enabled_default
         return True

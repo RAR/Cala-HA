@@ -14,6 +14,9 @@ from .const import DOMAIN
 from .coordinator import CalaDataUpdateCoordinator
 from .api import CalaApiClient
 
+# Pre-import platforms to avoid blocking calls during setup
+from . import sensor, binary_sensor, water_heater, button, number  # noqa: F401
+
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
 
