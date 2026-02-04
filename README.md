@@ -3,17 +3,17 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/release/RAR/Cala-HA.svg)](https://github.com/RAR/Cala-HA/releases)
 
-> ⚠️ **Alpha Release**: This integration is still in active development. Features may change, and bugs are expected. Please report any issues on the [GitHub Issues](https://github.com/RAR/Cala-HA/issues) page.
-
 A Home Assistant custom integration for Cala heat pump water heaters. This integration allows you to monitor and control your Cala water heater through Home Assistant.
 
 ## Features
 
 - **Water Heater Entity**: Full control with temperature adjustment and operation modes
+- **Boost & Vacation Modes**: Configurable duration controls with convenient activation buttons
 - **Temperature Sensors**: Real-time monitoring of tank temperatures (top, upper, lower), ambient, inlet, outlet, and delivery temperatures
-- **Compressor Sensors**: Monitor compressor frequency, delivery/suction pressures
-- **Usage Sensors**: Track energy consumption, water usage, and hot water availability
-- **Binary Sensors**: Device connectivity, compressor running, fan running, safety lockout status
+- **Compressor Sensors**: Monitor compressor frequency, speed, voltage, current, and refrigerant pressures
+- **Usage Sensors**: Track energy consumption (total and daily), water usage (total and daily), and hot water availability
+- **Binary Sensors**: Device connectivity, compressor running, fan running, heating elements, safety lockout, and active modes
+- **Smart Entity Management**: Advanced diagnostic sensors disabled by default to reduce clutter
 
 ## Supported Devices
 
