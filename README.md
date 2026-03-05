@@ -1,5 +1,9 @@
 # Cala Water Heater Integration for Home Assistant
 
+> **⚠️ This project has been superseded by an official integration from the manufacturer.**
+> We recommend using the official Cala integration instead:
+> [Cala Home Assistant – Water Heating That Responds to Your Home](https://www.calasystems.com/news/cala-home-assistant-water-heating-that-responds-to-your-home)
+
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/release/RAR/Cala-HA.svg)](https://github.com/RAR/Cala-HA/releases)
 
